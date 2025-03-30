@@ -34,10 +34,29 @@
                             </form>
                         </div>
                         <div class="flex-grow-1">
-                            <div class="d-flex align-items-center mb-2">
-                                <img src="@(Model.User?.AvatarUrl ?? "/images/default-avatar.png")" alt="Avatar" class="rounded-circle me-2" style="width: 40px; height: 40px;" />
-                                <p class="text-muted mb-0">Posted by <strong>@Model.User?.UserName</strong> on @Model.CreatedAt.ToString()</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center mb-2">
+                                    <img src="@(Model.User?.AvatarUrl ?? "/images/default-avatar.png")" alt="Avatar" class="rounded-circle me-2" style="width: 40px; height: 40px;" />
+                                    <p class="text-muted mb-0">Posted by <strong>@Model.User?.UserName</strong> on @Model.CreatedAt.ToString()</p>
+                                </div>
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <div class="mt-2">
+                                        @if (Model.IsDisabled)
+                                        {
+                                            <span class="badge bg-danger me-1">Disabled</span>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportModal"
+                                                    data-id="@Model.QuestionId" data-type="question">
+                                                <i class="bi bi-exclamation-triangle"></i> Report
+                                            </button>
+                                        }
+                                    </div>
+                                }
                             </div>
+                            
                             <h2 class="card-title">@Model.Title</h2>
                             <div class="card-text">@Html.Raw(Model.Content)</div>
                             @if (!string.IsNullOrEmpty(Model.ImageUrl))
@@ -52,22 +71,7 @@
                                     <span class="badge bg-primary me-1">@tag.Name</span>
                                 }
                             </div>
-                            @if (User.Identity.IsAuthenticated)
-                            {
-                                <div class="mt-2">
-                                    @if (Model.IsDisabled)
-                                    {
-                                        <span class="badge bg-danger me-1">Disabled</span>
-                                    }
-                                    else
-                                    {
-                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportModal"
-                                                data-id="@Model.QuestionId" data-type="question">
-                                            <i class="bi bi-exclamation-triangle"></i> Report
-                                        </button>
-                                    }
-                                </div>
-                            }
+                            
                         </div>
                     </div>
                 </div>
@@ -96,31 +100,33 @@
                                     </form>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <img src="@(answer.User?.AvatarUrl ?? "/images/default-avatar.png")" alt="Avatar" class="rounded-circle me-2" style="width: 40px; height: 40px;" />
-                                        <p class="text-muted mb-0">Answered by <strong>@answer.User?.UserName</strong> on @answer.CreatedAt.ToString()</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <img src="@(answer.User?.AvatarUrl ?? "/images/default-avatar.png")" alt="Avatar" class="rounded-circle me-2" style="width: 40px; height: 40px;" />
+                                            <p class="text-muted mb-0">Answered by <strong>@answer.User?.UserName</strong> on @answer.CreatedAt.ToString()</p>
+                                        </div>
+                                        @if (User.Identity.IsAuthenticated)
+                                        {
+                                            <div class="mt-2">
+                                                @if (answer.IsDisable)
+                                                {
+                                                    <span class="badge bg-danger me-1">Disabled</span>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportModal"
+                                                            data-id="@answer.AnswerId" data-type="answer">
+                                                        <i class="bi bi-exclamation-triangle"></i> Report
+                                                    </button>
+                                                }
+                                            </div>
+                                        }
                                     </div>
                                     <div class="card-text">@Html.Raw(answer.Content)</div>
                                     @if (!string.IsNullOrEmpty(answer.ImageUrl))
                                     {
                                         <div class="mt-2">
                                             <img src="@answer.ImageUrl" alt="Answer Image" class="img-fluid" style="max-height: 200px;" />
-                                        </div>
-                                    }
-                                    @if (User.Identity.IsAuthenticated)
-                                    {
-                                        <div class="mt-2">
-                                            @if(answer.IsDisable)
-                                            {
-                                                <span class="badge bg-danger me-1">Disabled</span>
-                                            }
-                                            else
-                                            {
-                                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportModal"
-                                                        data-id="@answer.AnswerId" data-type="answer">
-                                                    <i class="bi bi-exclamation-triangle"></i> Report
-                                                </button>
-                                            }
                                         </div>
                                     }
                                 </div>
@@ -174,10 +180,22 @@
                         </form>
                     </div>
                     <div class="flex-grow-1">
-                        <div class="d-flex align-items-center mb-2">
-                            <img src="@(Model.User?.AvatarUrl ?? "/images/default-avatar.png")" alt="Avatar" class="rounded-circle me-2" style="width: 40px; height: 40px;" />
-                            <p class="text-muted mb-0">Posted by <strong>@Model.User?.UserName</strong> on @Model.CreatedAt.ToString()</p>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="d-flex align-items-center mb-2">
+                                <img src="@(Model.User?.AvatarUrl ?? "/images/default-avatar.png")" alt="Avatar" class="rounded-circle me-2" style="width: 40px; height: 40px;" />
+                                <p class="text-muted mb-0">Posted by <strong>@Model.User?.UserName</strong> on @Model.CreatedAt.ToString()</p>
+                            </div>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportModal"
+                                            data-id="@Model.QuestionId" data-type="question">
+                                        <i class="bi bi-exclamation-triangle"></i> Report
+                                    </button>
+                                </div>
+                            }
                         </div>
+                        
                         <h2 class="card-title">@Model.Title</h2>
                         <div class="card-text">@Html.Raw(Model.Content)</div>
                         @if (!string.IsNullOrEmpty(Model.ImageUrl))
@@ -192,15 +210,7 @@
                                 <span class="badge bg-primary me-1">@tag.Name</span>
                             }
                         </div>
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <div class="mt-2">
-                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportModal"
-                                        data-id="@Model.QuestionId" data-type="question">
-                                    <i class="bi bi-exclamation-triangle"></i> Report
-                                </button>
-                            </div>
-                        }
+                        
                     </div>
                 </div>
             </div>
@@ -228,10 +238,22 @@
                                 </form>
                             </div>
                             <div class="flex-grow-1">
-                                <div class="d-flex align-items-center mb-2">
-                                    <img src="@(answer.User?.AvatarUrl ?? "/images/default-avatar.png")" alt="Avatar" class="rounded-circle me-2" style="width: 40px; height: 40px;" />
-                                    <p class="text-muted mb-0">Answered by <strong>@answer.User?.UserName</strong> on @answer.CreatedAt.ToString()</p>
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <img src="@(answer.User?.AvatarUrl ?? "/images/default-avatar.png")" alt="Avatar" class="rounded-circle me-2" style="width: 40px; height: 40px;" />
+                                        <p class="text-muted mb-0">Answered by <strong>@answer.User?.UserName</strong> on @answer.CreatedAt.ToString()</p>
+                                    </div>
+                                    @if (User.Identity.IsAuthenticated)
+                                    {
+                                        <div class="mt-2">
+                                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportModal"
+                                                    data-id="@answer.AnswerId" data-type="answer">
+                                                <i class="bi bi-exclamation-triangle"></i> Report
+                                            </button>
+                                        </div>
+                                    }
                                 </div>
+                                
                                 <div class="card-text">@Html.Raw(answer.Content)</div>
                                 @if (!string.IsNullOrEmpty(answer.ImageUrl))
                                 {
@@ -239,15 +261,7 @@
                                         <img src="@answer.ImageUrl" alt="Answer Image" class="img-fluid" style="max-height: 200px;" />
                                     </div>
                                 }
-                                @if (User.Identity.IsAuthenticated)
-                                {
-                                    <div class="mt-2">
-                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportModal"
-                                                data-id="@answer.AnswerId" data-type="answer">
-                                            <i class="bi bi-exclamation-triangle"></i> Report
-                                        </button>
-                                    </div>
-                                }
+                                
                             </div>
                         </div>
                     </div>
@@ -335,6 +349,7 @@
         document.getElementById('answerTrigger').addEventListener('focus', function () {
             var answerFields = document.getElementById('answerFields');
             if (answerFields.style.display === 'none') {
+                document.getElementById('answerTrigger').style.display = 'none';
                 answerFields.style.display = 'block';
                 tinymce.init({
                     selector: '#answerContent',

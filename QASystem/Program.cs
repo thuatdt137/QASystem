@@ -1,7 +1,7 @@
-﻿// Program.cs
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using QASystem.Models;
+using QASystem.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +20,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
     options.LogoutPath = "/Account/Logout";
-    options.AccessDeniedPath = "/Account/AccessDenied";
+    options.AccessDeniedPath = "/Home/AccessDenied";
 });
 
 // Thêm session
@@ -31,38 +31,35 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// Thêm dịch vụ email
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 var app = builder.Build();
 
 // Cấu hình middleware
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseSession(); // Thêm middleware session
-app.UseAuthentication(); // Thêm xác thực
+app.UseSession();
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseExceptionHandler(errorApp =>
+// Xử lý lỗi 404 và 403 tùy chỉnh
+app.UseStatusCodePages(async context =>
 {
-    errorApp.Run(async context =>
+    var response = context.HttpContext.Response;
+    if (response.StatusCode == 403)
     {
-        context.Response.StatusCode = 404;
-        context.Response.Redirect("/Home/NotFound");
-    });
-});
-
-app.UseStatusCodePagesWithReExecute("/Home/NotFound", "?statusCode={0}");
-app.UseStatusCodePagesWithReExecute("/Home/AccessDenied", "?statusCode={0}");
-
-// Xử lý lỗi quyền hạn
-app.Use(async (context, next) =>
-{
-    await next();
-    if (context.Response.StatusCode == 403)
+        response.Redirect("/Home/AccessDenied");
+    }
+    else if (response.StatusCode == 404)
     {
-        context.Response.Redirect("/Home/AccessDenied");
+        response.Redirect("/Home/NotFound");
     }
 });
 
+// Route mặc định
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

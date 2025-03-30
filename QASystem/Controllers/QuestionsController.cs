@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QASystem.Models;
+using QASystem.Services;
 
 namespace QASystem.Controllers
 {
@@ -10,12 +11,14 @@ namespace QASystem.Controllers
     {
         private readonly QasystemContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly IEmailService _emailService;
         private const int PageSize = 5;
 
-        public QuestionsController(QasystemContext context, UserManager<User> userManager)
+        public QuestionsController(QasystemContext context, UserManager<User> userManager, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         public async Task<IActionResult> Details(int id, int page = 1)
@@ -192,6 +195,40 @@ namespace QASystem.Controllers
 
             _context.Reports.Add(report);
             await _context.SaveChangesAsync();
+
+
+            if (questionId.HasValue)
+            {
+                var question = await _context.Questions.Include(q => q.User).FirstOrDefaultAsync(q => q.QuestionId == questionId);
+                if (question != null)
+                {
+                    await _emailService.SendEmailAsync(
+                        question.User.Email,
+                        "Your Question Has Been Reported",
+                        $"Dear {question.User.UserName},<br/><br/>" +
+                        $"Your question titled '<strong>{question.Title}</strong>' has been reported for the following reason: {reason}.<br/>" +
+                        "Please review our community guidelines. If you have any questions, contact our support team.<br/><br/>" +
+                        "Regards,<br/>QASystem Team"
+                    );
+                }
+            }
+            else if (answerId.HasValue)
+            {
+                var answer = await _context.Answers.Include(a => a.User).FirstOrDefaultAsync(a => a.AnswerId == answerId);
+                if (answer != null)
+                {
+                    await _emailService.SendEmailAsync(
+                        answer.User.Email,
+                        "Your Answer Has Been Reported",
+                        $"Dear {answer.User.UserName},<br/><br/>" +
+                        $"Your answer to a question has been reported for the following reason: {reason}.<br/>" +
+                        "Please review our community guidelines. If you have any questions, contact our support team.<br/><br/>" +
+                        "Regards,<br/>QASystem Team"
+                    );
+                }
+            }
+
+
 
             TempData["Success"] = "Your report has been submitted.";
             var redirectId = questionId ?? (await _context.Answers.FindAsync(answerId)).QuestionId;

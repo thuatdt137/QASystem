@@ -18,7 +18,6 @@ namespace QASystem.Controllers
             _context = context;
             _userManager = userManager;
         }
-
         public async Task<IActionResult> Index(int page = 1, string keyword = null, string tag = null, string username = null)
         {
             List<Question> questions = new List<Question>();
@@ -34,6 +33,7 @@ namespace QASystem.Controllers
                     .Include(q => q.Answers)
                     .AsQueryable();
 
+                // Áp dụng các bộ lọc
                 if (!string.IsNullOrEmpty(keyword))
                 {
                     keyword = keyword.ToLower();
@@ -50,13 +50,23 @@ namespace QASystem.Controllers
                     questionsQuery = questionsQuery.Where(q => q.User.UserName.ToLower().Contains(username.ToLower()));
                 }
 
+                // Tính tổng số câu hỏi
                 var totalQuestions = await questionsQuery.CountAsync();
+
+                // Sắp xếp theo câu trả lời gần nhất (nếu có), nếu không thì theo CreatedAt của câu hỏi
                 questions = await questionsQuery
-                    .OrderByDescending(q => q.CreatedAt)
+                    .Select(q => new
+                    {
+                        Question = q,
+                        LatestAnswerTime = q.Answers.OrderByDescending(a => a.CreatedAt).Select(a => (DateTime?)a.CreatedAt).FirstOrDefault() ?? q.CreatedAt
+                    })
+                    .OrderByDescending(q => q.LatestAnswerTime) // Sắp xếp theo thời gian câu trả lời gần nhất
                     .Skip((page - 1) * PageSize)
                     .Take(PageSize)
+                    .Select(q => q.Question)
                     .ToListAsync();
 
+                // Lấy các câu trả lời gần đây
                 var recentAnswers = await _context.Answers
                     .Include(a => a.User)
                     .Include(a => a.Question)
@@ -64,6 +74,7 @@ namespace QASystem.Controllers
                     .Take(5)
                     .ToListAsync();
 
+                // Thống kê cho từng câu hỏi
                 var questionStats = questions.ToDictionary(
                     q => q.QuestionId,
                     q => new QuestionStatsViewModel
@@ -169,6 +180,10 @@ namespace QASystem.Controllers
                 Response.StatusCode = statusCode.Value;
             }
             return View("~/Views/Shared/AccessDenied.cshtml");
+        }
+        public IActionResult Privacy()
+        {
+            return View();
         }
     }
 }

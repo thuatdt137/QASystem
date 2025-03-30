@@ -11,8 +11,7 @@
     var questionStats = ViewBag.QuestionStats as Dictionary<int, QuestionStatsViewModel>;
 }
 
-<div class="container mt-4">
-    <!-- Hiển thị thông báo lỗi nếu có -->
+<div class="mt-4">
     @if (TempData["Error"] != null)
     {
         <div class="alert alert-danger" role="alert">
@@ -20,7 +19,6 @@
         </div>
     }
 
-    <!-- Form tạo câu hỏi -->
     @if (User.Identity.IsAuthenticated)
     {
         <div class="card shadow-sm mb-4">
@@ -48,14 +46,6 @@
         </div>
     }
 
-    <!-- Nút biểu tượng filter -->
-    <div class="mb-4">
-        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
-            <i class="bi bi-funnel"></i> Filter Questions
-        </button>
-    </div>
-
-    <!-- Modal chứa form lọc -->
     <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -85,9 +75,15 @@
     </div>
 
     <div class="row">
-        <!-- Danh sách câu hỏi -->
-        <div class="col-md-8">
-            <h4 class="mb-3">Recent Questions</h4>
+        <div class="col-md-9">
+            <div class="section-header">
+                <h4 class="mb-3">Recent Questions</h4>
+                <div class="mb-4">
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+                        <i class="bi bi-funnel"></i> Filter Questions
+                    </button>
+                </div>
+            </div>
             @if (Model.Any())
             {
                 @foreach (var question in Model)
@@ -97,9 +93,20 @@
                     : new QuestionStatsViewModel();
                     <div class="card shadow-sm mb-3">
                         <div class="card-body">
-                            <div class="d-flex align-items-center mb-2">
-                                <img src="@(question.User?.AvatarUrl ?? "/images/default-avatar.png")" alt="Avatar" class="rounded-circle me-2" style="width: 40px; height: 40px;" />
-                                <p class="text-muted mb-0">Posted by <strong>@question.User?.UserName</strong></p>
+                            <div class="d-flex justify-content-between">
+                                <div class="d-flex align-items-center mb-2">
+                                    <img src="@(question.User?.AvatarUrl ?? "/images/default-avatar.png")" alt="Avatar" class="rounded-circle me-2" style="width: 40px; height: 40px;" />
+                                    <p class="text-muted mb-0">Posted by <strong>@question.User?.UserName</strong></p>
+                                </div>
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <div class="">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportModal"
+                                                data-id="@question.QuestionId" data-type="question">
+                                            <i class="bi bi-exclamation-triangle"></i> Report
+                                        </button>
+                                    </div>
+                                }
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <h5 class="card-title mb-0">
@@ -132,15 +139,6 @@
                                     <img src="@question.ImageUrl" alt="Question Image" class="img-fluid" style="max-height: 200px;" />
                                 </div>
                             }
-                            @if (User.Identity.IsAuthenticated)
-                            {
-                                <div class="mt-2">
-                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportModal"
-                                            data-id="@question.QuestionId" data-type="question">
-                                        <i class="bi bi-exclamation-triangle"></i> Report
-                                    </button>
-                                </div>
-                            }
                         </div>
                     </div>
                 }
@@ -167,8 +165,7 @@
             }
         </div>
 
-        <!-- Danh sách câu trả lời gần đây -->
-        <div class="col-md-4">
+        <div class="col-md-3">
             <h4 class="mb-3">Recent Answers</h4>
             @if (recentAnswers != null && recentAnswers.Any())
             {
@@ -203,7 +200,6 @@
         </div>
     </div>
 
-    <!-- Modal Báo cáo -->
     <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
