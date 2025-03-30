@@ -183,7 +183,7 @@ namespace QASystem.Controllers
                     TempData["Error"] = "Answer not found.";
                     return RedirectToAction("ManageReports");
                 }
-                answer.IsDisable = true;
+                answer.IsDisabled = true;
             }
 
 
@@ -219,7 +219,7 @@ namespace QASystem.Controllers
                     TempData["Error"] = "Answer not found.";
                     return RedirectToAction("ManageReports");
                 }
-                answer.IsDisable = true;
+                answer.IsDisabled = true;
 
                 // Gửi email cho chủ nhân của answer
                 await _emailService.SendEmailAsync(

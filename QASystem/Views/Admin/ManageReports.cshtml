@@ -51,7 +51,7 @@
                                 @Html.Raw(report.Answer.Content.Substring(0, Math.Min(50, report.Answer.Content.Length)))
 
                                 @(report.Answer.Content.Length > 50 ? "..." : "")
-                                if (report.Answer.IsDisable)
+                                if (report.Answer.IsDisabled)
                                 {
                                     <span class="badge bg-danger ms-2">Disabled</span>
                                 }
@@ -67,7 +67,7 @@
                                     <button type="submit" class="btn btn-danger btn-sm">Disable</button>
                                 </form>
                             }
-                            else if (report.AnswerId.HasValue && !report.Answer.IsDisable)
+                            else if (report.AnswerId.HasValue && !report.Answer.IsDisabled)
                             {
                                 <form asp-controller="Admin" asp-action="DisableContent" method="post" class="d-inline">
                                     <input type="hidden" name="answerId" value="@report.AnswerId" />

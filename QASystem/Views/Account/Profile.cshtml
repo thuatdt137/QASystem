@@ -45,7 +45,12 @@
                             <label for="avatar" class="form-label">Upload New Avatar (optional)</label>
                             <input type="file" name="avatar" id="avatar" class="form-control" accept="image/*" />
                         </div>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <div class="gap-3">
+                            <button type="submit" class="btn btn-outline-success">Save Changes</button>
+                            <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                                Change Password
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -105,5 +110,35 @@
         {
             <p class="text-muted">No recent activities.</p>
         }
+    </div>
+
+    <!-- Modal Change Password -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="ChangePassword" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label">Current Password</label>
+                            <input type="password" name="currentPassword" id="currentPassword" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">New Password</label>
+                            <input type="password" name="newPassword" id="newPassword" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                            <input type="password" name="confirmPassword" id="confirmPassword" class="form-control" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

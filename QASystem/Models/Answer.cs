@@ -14,7 +14,7 @@ public partial class Answer
     public string Content { get; set; } = null!;
     public DateTime? CreatedAt { get; set; }
     public string? ImageUrl { get; set; }
-    public bool IsDisable { get; set; } = false;
+    public bool IsDisabled { get; set; } = false;
     public virtual Question Question { get; set; } = null!;
 
     public virtual ICollection<Report> Reports { get; set; } = new List<Report>();

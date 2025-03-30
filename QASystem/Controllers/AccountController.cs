@@ -61,7 +61,7 @@ namespace QASystem.Controllers
 
             // Answers
             var recentAnswers = await _context.Answers
-                .Where(a => a.UserId == user.Id && !a.IsDisable)
+                .Where(a => a.UserId == user.Id && !a.IsDisabled)
                 .Select(a => new Activity
                 {
                     Type = "Answer",
@@ -164,8 +164,38 @@ namespace QASystem.Controllers
             return RedirectToAction("Profile");
         }
 
-        // GET: Đăng ký
-        [HttpGet]
+		[Authorize]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ChangePassword(string currentPassword, string newPassword, string confirmPassword)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null)
+			{
+				return NotFound();
+			}
+
+			if (newPassword != confirmPassword)
+			{
+				TempData["Error"] = "New password and confirmation do not match.";
+				return RedirectToAction("Profile");
+			}
+
+			var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+			if (result.Succeeded)
+			{
+				// Đăng nhập lại người dùng để cập nhật phiên đăng nhập
+				await _signInManager.RefreshSignInAsync(user);
+				TempData["Success"] = "Password changed successfully.";
+				return RedirectToAction("Profile");
+			}
+
+			TempData["Error"] = "Failed to change password: " + string.Join(", ", result.Errors.Select(e => e.Description));
+			return RedirectToAction("Profile");
+		}
+
+		// GET: Đăng ký
+		[HttpGet]
         public IActionResult Register()
         {
             return View(new User());
