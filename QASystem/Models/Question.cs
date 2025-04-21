@@ -28,4 +28,6 @@ public partial class Question
     public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
 
     public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
+
+    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 }

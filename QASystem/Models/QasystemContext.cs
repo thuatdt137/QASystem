@@ -24,6 +24,8 @@ namespace QASystem.Models
         public virtual DbSet<Report> Reports { get; set; }
         public virtual DbSet<Tag> Tags { get; set; }
         public virtual DbSet<Vote> Votes { get; set; }
+        public virtual DbSet<Material> Materials { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
 
         // Cấu hình chuỗi kết nối cơ sở dữ liệu
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -74,6 +76,7 @@ namespace QASystem.Models
                     .HasColumnType("datetime");
                 entity.Property(e => e.QuestionId).HasColumnName("QuestionID");
                 entity.Property(e => e.UserId).HasColumnName("UserID");
+                entity.Property(e => e.ParentAnswerId).HasColumnName("ParentAnswerID");
 
                 entity.HasOne(d => d.Question).WithMany(p => p.Answers)
                     .HasForeignKey(d => d.QuestionId)
@@ -84,6 +87,11 @@ namespace QASystem.Models
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("FK__Answers__UserID__300424B4");
+
+                entity.HasOne(d => d.ParentAnswer).WithMany(p => p.ChildAnswers)
+                    .HasForeignKey(d => d.ParentAnswerId)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("FK__Answers__ParentAnswerID__31EC6D26");
             });
 
             // Cấu hình bảng Questions
@@ -182,6 +190,54 @@ namespace QASystem.Models
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Votes__UserID__3B75D760");
+            });
+
+            // Cấu hình bảng Materials
+            modelBuilder.Entity<Material>(entity =>
+            {
+                entity.HasKey(e => e.MaterialId).HasName("PK__Materials__C506131A9F3E2C1D");
+                entity.Property(e => e.MaterialId).HasColumnName("MaterialID");
+                entity.Property(e => e.Title).HasMaxLength(255).IsRequired();
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.FileLink).HasMaxLength(500);
+                entity.Property(e => e.Downloads).HasDefaultValue(0);
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+                entity.Property(e => e.UserId).HasColumnName("UserID");
+
+                entity.HasOne(d => d.User).WithMany(p => p.Materials)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .HasConstraintName("FK__Materials__UserID__4A8310C6");
+            });
+
+            // Cấu hình bảng Notifications
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.HasKey(e => e.NotificationId).HasName("PK__Notifications__20CF2E32B8A2F7E4");
+                entity.Property(e => e.NotificationId).HasColumnName("NotificationID");
+                entity.Property(e => e.QuestionId).HasColumnName("QuestionID");
+                entity.Property(e => e.AnswerId).HasColumnName("AnswerID");
+                entity.Property(e => e.Message).HasMaxLength(500).IsRequired();
+                entity.Property(e => e.IsRead).HasDefaultValue(false);
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+                entity.Property(e => e.UserId).HasColumnName("UserID");
+
+                entity.HasOne(d => d.Question).WithMany(p => p.Notifications)
+                    .HasForeignKey(d => d.QuestionId)
+                    .HasConstraintName("FK__Notifications__QuestionID__4D5F7D71");
+
+                entity.HasOne(d => d.Answer).WithMany(p => p.Notifications)
+                    .HasForeignKey(d => d.AnswerId)
+                    .HasConstraintName("FK__Notifications__AnswerID__4E53A1AA");
+
+                entity.HasOne(d => d.User).WithMany(p => p.Notifications)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Notifications__UserID__4C6B5938");
             });
 
             OnModelCreatingPartial(modelBuilder);

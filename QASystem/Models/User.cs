@@ -19,4 +19,8 @@ public partial class User : IdentityUser<int>
     public virtual ICollection<Report> Reports { get; set; } = new List<Report>();
 
     public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
+
+    public virtual ICollection<Material> Materials { get; set; } = new List<Material>();
+
+    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 }
