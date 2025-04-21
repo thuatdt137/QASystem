@@ -33,7 +33,6 @@ namespace QASystem.Controllers
                     .Include(q => q.Answers)
                     .AsQueryable();
 
-                // Áp dụng các bộ lọc
                 if (!string.IsNullOrEmpty(keyword))
                 {
                     keyword = keyword.ToLower();
@@ -50,10 +49,8 @@ namespace QASystem.Controllers
                     questionsQuery = questionsQuery.Where(q => q.User.UserName.ToLower().Contains(username.ToLower()));
                 }
 
-                // Tính tổng số câu hỏi
                 var totalQuestions = await questionsQuery.CountAsync();
 
-                // Sắp xếp theo câu trả lời gần nhất (nếu có), nếu không thì theo CreatedAt của câu hỏi
                 questions = await questionsQuery
                     .Select(q => new
                     {
